@@ -32,16 +32,16 @@ def about():
     return render_template("about.html", username=session["user"])
 
 QUESTIONS = [
-    {"cn": "你好", "pinyin": "nǐ hǎo", "answer": "hello"},
-    {"cn": "谢谢", "pinyin": "xiè xie", "answer": "thank you"},
-    {"cn": "再见", "pinyin": "zài jiàn", "answer": "goodbye"},
-    {"cn": "我是学生", "pinyin": "wǒ shì xué sheng", "answer": "i am a student"},
-    {"cn": "你好吗？", "pinyin": "nǐ hǎo ma", "answer": "how are you"},
-    {"cn": "我喜欢咖啡", "pinyin": "wǒ xǐ huān kā fēi", "answer": "i like coffee"},
-    {"cn": "今天很热", "pinyin": "jīn tiān hěn rè", "answer": "today is hot"},
-    {"cn": "请坐", "pinyin": "qǐng zuò", "answer": "please sit"},
-    {"cn": "我会说一点中文", "pinyin": "wǒ huì shuō yì diǎn zhōng wén", "answer": "i speak a little chinese"},
-    {"cn": "晚安", "pinyin": "wǎn ān", "answer": "good night"},
+    {"cn": "你好", "pinyin": "nǐ hǎo", "answer": "你好"},
+    {"cn": "谢谢", "pinyin": "xiè xie", "answer": "谢谢"},
+    {"cn": "再见", "pinyin": "zài jiàn", "answer": "再见"},
+    {"cn": "我是学生", "pinyin": "wǒ shì xué sheng", "answer": "我是学生"},
+    {"cn": "你好吗？", "pinyin": "nǐ hǎo ma", "answer": "你好吗"},
+    {"cn": "我喜欢咖啡", "pinyin": "wǒ xǐ huān kā fēi", "answer": "我喜欢咖啡"},
+    {"cn": "今天很热", "pinyin": "jīn tiān hěn rè", "answer": "今天很热"},
+    {"cn": "请坐", "pinyin": "qǐng zuò", "answer": "请坐"},
+    {"cn": "我会说一点中文", "pinyin": "wǒ huì shuō yì diǎn zhōng wén", "answer": "我会说一点中文"},
+    {"cn": "晚安", "pinyin": "wǎn ān", "answer": "晚安"},
 ]
 
 
