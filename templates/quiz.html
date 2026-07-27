@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chinese Quiz</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 700px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .sentence {
+            font-size: 42px;
+            margin: 40px;
+        }
+
+        input {
+            width: 90%;
+            font-size: 22px;
+            padding: 12px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 18px;
+        }
+
+        #result {
+            margin-top: 20px;
+            color: red;
+            font-size: 20px;
+        }
+
+        #pinyin {
+            display: none;
+            color: #0066cc;
+            margin-top: 10px;
+            font-size: 22px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Question {{ number }} / {{ total }}</h2>
+
+    <div class="sentence">
+        {{ question.cn }}
+    </div>
+
+    <input id="answer" autocomplete="off" autofocus>
+
+    <br>
+
+    <button onclick="check()">Check</button>
+
+    <button id="showBtn" style="display:none;" onclick="showPinyin()">
+        Show Pinyin
+    </button>
+
+    <div id="result"></div>
+
+    <div id="pinyin">{{ question.pinyin }}</div>
+
+    <audio id="correctSound">
+        <source src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg">
+    </audio>
+
+    <script>
+
+        async function check() {
+
+            const answer = document.getElementById("answer").value;
+
+            const res = await fetch("/check", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "answer=" + encodeURIComponent(answer)
+            });
+
+            const data = await res.json();
+
+            if (data.correct) {
+
+                document.getElementById("result").style.color = "green";
+                document.getElementById("result").innerText = "Correct!";
+
+                document.getElementById("correctSound").play();
+
+                setTimeout(() => {
+                    location.reload();
+                }, 800);
+
+            } else {
+
+                document.getElementById("result").style.color = "red";
+                document.getElementById("result").innerText = "Incorrect";
+
+                document.getElementById("showBtn").style.display = "inline-block";
+            }
+
+        }
+
+        function showPinyin() {
+            document.getElementById("pinyin").style.display = "block";
+        }
+
+        document.getElementById("answer").addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                check();
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>
