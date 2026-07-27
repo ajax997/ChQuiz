@@ -4,193 +4,415 @@
 <head>
     <meta charset="UTF-8">
 
-    <!-- Prevent Safari zoom -->
     <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+          content="width=device-width,
+                   initial-scale=1,
+                   viewport-fit=cover">
 
     <title>Chinese Typing Practice</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
     <style>
-        body {
-            background: #f8f9fa;
+        :root{
+            --primary:#58cc02;
+            --danger:#ff4b4b;
+            --card-radius:28px;
         }
 
-        .quiz-card {
-            max-width: 700px;
-            margin: 60px auto;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,.08);
+        html,
+        body{
+            height:100%;
         }
 
-        .sentence {
-            font-size: 48px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            margin: 30px 0;
+        body{
+
+            background:#f5f7fb;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                sans-serif;
+
+            overscroll-behavior:none;
+
+            padding-bottom:140px;
         }
 
-        input {
-            font-size: 20px !important; /* Prevent Safari zoom */
-            height: 58px;
+        .container{
+
+            max-width:720px;
+            margin:auto;
+            padding-top:40px;
         }
 
-        #pinyin {
-            display: none;
-            font-size: 22px;
-            color: #0d6efd;
+        .card{
+
+            border:none;
+            border-radius:var(--card-radius);
+
+            box-shadow:
+                0 15px 40px rgba(0,0,0,.08);
         }
 
-        .correct {
-            color: #198754;
-            font-weight: bold;
+        .progress{
+
+            height:12px;
+            border-radius:999px;
         }
 
-        .wrong {
-            color: #dc3545;
-            font-weight: bold;
+        .progress-bar{
+            background:var(--primary);
         }
 
-        .progress {
-            height: 10px;
+        .sentence{
+
+            font-size:54px;
+            font-weight:700;
+            letter-spacing:2px;
+
+            text-align:center;
+
+            margin:50px 0;
         }
+
+        .typing-box{
+
+            font-size:20px !important;
+
+            height:60px;
+
+            text-align:center;
+
+            border-radius:16px;
+        }
+
+        .typing-box:focus{
+
+            box-shadow:none;
+
+            border-color:var(--primary);
+        }
+
+        .feedback{
+
+            min-height:36px;
+
+            margin-top:20px;
+
+            text-align:center;
+
+            font-size:22px;
+
+            font-weight:600;
+        }
+
+        .correct{
+
+            color:var(--primary);
+        }
+
+        .wrong{
+
+            color:var(--danger);
+        }
+
+        #pinyin{
+
+            display:none;
+
+            font-size:22px;
+
+            color:#0d6efd;
+
+            text-align:center;
+
+            margin-top:12px;
+        }
+
+        .bottom-bar{
+
+            position:fixed;
+
+            left:0;
+            right:0;
+            bottom:0;
+
+            background:white;
+
+            padding:16px;
+
+            padding-bottom:max(16px, env(safe-area-inset-bottom));
+
+            border-top:1px solid #eee;
+
+            box-shadow:
+                0 -10px 25px rgba(0,0,0,.08);
+
+            transition:bottom .15s;
+
+            z-index:999;
+        }
+
+        .btn-success{
+
+            background:var(--primary);
+            border:none;
+        }
+
+        .btn-success:hover{
+
+            background:#4eb400;
+        }
+
+        .shake{
+
+            animation:shake .35s;
+        }
+
+        @keyframes shake{
+
+            0%{transform:translateX(0);}
+            25%{transform:translateX(-8px);}
+            50%{transform:translateX(8px);}
+            75%{transform:translateX(-8px);}
+            100%{transform:translateX(0);}
+        }
+
     </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-<div class="card quiz-card">
+    <div class="card">
 
-<div class="card-body p-5">
+        <div class="card-body p-4 p-md-5">
 
-<h6 class="text-muted">
-Question {{ number }} / {{ total }}
-</h6>
+            <div class="d-flex justify-content-between mb-2">
 
-<div class="progress mb-4">
-<div class="progress-bar"
-style="width: {{ (number/total)*100 }}%"></div>
+                <small class="text-secondary">
+
+                    Question {{ number }} / {{ total }}
+
+                </small>
+
+                <small class="text-secondary">
+
+                    {{ ((number/total)*100)|round|int }}%
+
+                </small>
+
+            </div>
+
+            <div class="progress">
+
+                <div class="progress-bar"
+                     style="width:{{ (number/total)*100 }}%"></div>
+
+            </div>
+
+            <div class="sentence">
+
+                {{ question.cn }}
+
+            </div>
+
+            <p class="text-center text-secondary mb-3">
+
+                Type the sentence exactly as shown.
+
+            </p>
+
+            <input
+
+                id="answer"
+
+                class="form-control typing-box"
+
+                autocomplete="off"
+
+                autocorrect="off"
+
+                autocapitalize="off"
+
+                spellcheck="false"
+
+                inputmode="text"
+
+                enterkeyhint="done"
+
+                name="typing"
+
+                autofocus>
+
+            <div id="feedback"
+                 class="feedback"></div>
+
+            <div id="pinyin">
+
+                {{ question.pinyin }}
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
-<div class="sentence text-center">
-{{ question.cn }}
-</div>
 
-<div class="text-center text-muted mb-3">
-Type exactly what you see
-</div>
+<div class="bottom-bar">
 
-<input
-id="answer"
-class="form-control"
-autocomplete="off"
-autocorrect="off"
-autocapitalize="off"
-spellcheck="false">
+    <div class="d-grid gap-2">
 
-<div class="d-grid gap-2 mt-4">
+        <button
 
-<button
-class="btn btn-success btn-lg"
-onclick="check()">
-Check
-</button>
+            class="btn btn-success btn-lg"
 
-<button
-id="showBtn"
-class="btn btn-outline-secondary"
-style="display:none"
-onclick="showPinyin()">
+            onclick="check()">
 
-Show Pinyin
+            Check
 
-</button>
+        </button>
+
+        <button
+
+            id="showBtn"
+
+            class="btn btn-outline-secondary"
+
+            onclick="showPinyin()"
+
+            style="display:none">
+
+            Show Pinyin
+
+        </button>
+
+    </div>
 
 </div>
 
-<div
-id="feedback"
-class="text-center mt-4 fs-5">
-</div>
-
-<div
-id="pinyin"
-class="text-center mt-3">
-{{ question.pinyin }}
-</div>
-
-</div>
-
-</div>
-
-</div>
 
 <audio id="correctSound">
-<source src="https://actions.google.com/sounds/v1/cartoon/pop.ogg">
+
+    <source src="https://actions.google.com/sounds/v1/cartoon/pop.ogg">
+
 </audio>
 
 <script>
 
-const correct = "{{ question.cn }}";
+const correct="{{ question.cn }}";
 
-function normalize(s){
-    return s
+const input=document.getElementById("answer");
+
+const feedback=document.getElementById("feedback");
+
+const bottomBar=document.querySelector(".bottom-bar");
+
+function normalize(text){
+
+    return text
         .replace(/\s+/g,"")
         .trim();
 }
 
 async function check(){
 
-    const answer=document.getElementById("answer").value;
+    const value=input.value;
 
-    if(normalize(answer)==normalize(correct)){
+    if(normalize(value)==normalize(correct)){
 
-        document.getElementById("feedback").innerHTML=
-        '<span class="correct">✓ Correct</span>';
+        feedback.innerHTML='<span class="correct">✓ Correct!</span>';
 
         document.getElementById("correctSound").play();
 
         await fetch("/check",{
+
             method:"POST",
+
             headers:{
                 "Content-Type":"application/x-www-form-urlencoded"
             },
-            body:"answer="+encodeURIComponent(answer)
+
+            body:"answer="+encodeURIComponent(value)
+
         });
 
         setTimeout(()=>{
+
             location.reload();
+
         },700);
 
-    }else{
+    }
 
-        document.getElementById("feedback").innerHTML=
-        '<span class="wrong">✗ Try again</span>';
+    else{
+
+        feedback.innerHTML='<span class="wrong">✗ Try Again</span>';
+
+        input.classList.remove("shake");
+
+        void input.offsetWidth;
+
+        input.classList.add("shake");
 
         document.getElementById("showBtn").style.display="block";
-
     }
 
 }
 
 function showPinyin(){
+
     document.getElementById("pinyin").style.display="block";
+
 }
 
-document.getElementById("answer")
-.addEventListener("keydown",function(e){
+input.addEventListener("keydown",function(e){
+
     if(e.key==="Enter"){
+
         check();
+
     }
+
 });
 
-document.getElementById("answer").focus();
+function updateBottomBar(){
+
+    if(!window.visualViewport) return;
+
+    const keyboardHeight=
+        window.innerHeight-window.visualViewport.height;
+
+    bottomBar.style.bottom=
+        Math.max(keyboardHeight,0)+"px";
+}
+
+if(window.visualViewport){
+
+    visualViewport.addEventListener("resize",updateBottomBar);
+
+    visualViewport.addEventListener("scroll",updateBottomBar);
+
+    updateBottomBar();
+
+}
+
+window.onload=()=>{
+
+    input.focus();
+
+};
 
 </script>
 
 </body>
+
 </html>
