@@ -1,9 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from mongo_connect import test_mongo_connection
 import csv
 import random
 app = Flask(__name__)
 app.secret_key = "replace-with-a-random-secret-key"
 
+@app.route("/test_mongo")
+def mongo():
+    return test_mongo_connection()
 
 @app.route("/")
 def index():
