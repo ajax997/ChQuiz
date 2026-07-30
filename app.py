@@ -13,7 +13,7 @@ app.secret_key = os.getenv("SERVICE_SECRET")
 def mongo():
     return test_mongo_connection()
 
-cred = credentials.Certificate(os.getenv("SERVICE_ACCOUNT_KEY_PATH"))
+cred = credentials.Certificate("serviceAccountKey.json")
 initialize_app(cred)
 
 @app.route("/")
