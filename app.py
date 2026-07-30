@@ -24,15 +24,14 @@ def index():
 
 @app.route("/api/verify-token", methods=["POST"])
 def verify_token():
-    """Verify Firebase ID Token sent from the frontend."""
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     id_token = data.get("idToken")
 
-    try:
-        # Verify token with Firebase Admin
-        decoded_token = auth.verify_id_token(id_token)
+    if not id_token:
+        return jsonify({"status": "error", "message": "Missing idToken in request payload."}), 400
 
-        # Store user info in session
+    try:
+        decoded_token = auth.verify_id_token(id_token)
         session["user"] = {
             "uid": decoded_token.get("uid"),
             "email": decoded_token.get("email"),
@@ -41,8 +40,8 @@ def verify_token():
         }
         return jsonify({"status": "success", "user": session["user"]}), 200
     except Exception as e:
+        print(f"Token Verification Error: {e}")  # Print to terminal so you see exact cause
         return jsonify({"status": "error", "message": str(e)}), 401
-
 
 @app.route("/logout", methods=["POST"])
 def logout():

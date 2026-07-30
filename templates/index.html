@@ -93,6 +93,7 @@
                     window.location.reload();
                 } else {
                     alert("Authentication failed on backend.");
+                    alert(response.message);
                 }
             } catch (error) {
                 console.error("Login Error:", error);
