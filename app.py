@@ -1,33 +1,53 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-from mongo_connect import test_mongo_connection
 import csv
 import random
+import os
+from firebase_admin import credentials, initialize_app,auth
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify
+
+from mongo_connect import test_mongo_connection
+
 app = Flask(__name__)
-app.secret_key = "replace-with-a-random-secret-key"
+app.secret_key = os.getenv("SERVICE_SECRET")
 
 @app.route("/test_mongo")
 def mongo():
     return test_mongo_connection()
 
+cred = credentials.Certificate(os.getenv("SERVICE_ACCOUNT_KEY_PATH"))
+initialize_app(cred)
+
 @app.route("/")
 def index():
-    if "user" in session:
-        return redirect(url_for("about"))
-    return redirect(url_for("login"))
+    user = session.get("user")
+    return render_template("index.html", user=user)
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
+@app.route("/api/verify-token", methods=["POST"])
+def verify_token():
+    """Verify Firebase ID Token sent from the frontend."""
+    data = request.get_json()
+    id_token = data.get("idToken")
 
-        if username:
-            # Password is ignored for now.
-            session["user"] = username
-            return redirect(url_for("quiz"))
+    try:
+        # Verify token with Firebase Admin
+        decoded_token = auth.verify_id_token(id_token)
 
-    return render_template("login.html")
+        # Store user info in session
+        session["user"] = {
+            "uid": decoded_token.get("uid"),
+            "email": decoded_token.get("email"),
+            "name": decoded_token.get("name"),
+            "picture": decoded_token.get("picture"),
+        }
+        return jsonify({"status": "success", "user": session["user"]}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 401
 
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.pop("user", None)
+    return jsonify({"status": "success"}), 200
 
 @app.route("/about")
 def about():
@@ -73,14 +93,6 @@ def load_questions(csv_file):
 
 
 QUESTIONS = load_questions("hanzii-t-mi.csv")
-
-
-@app.route("/")
-def home():
-    session["question"] = 0
-    return redirect(url_for("quiz"))
-
-
 @app.route("/quiz")
 def quiz():
     idx = session.get("question", 0)
@@ -112,11 +124,6 @@ def check():
             "correct": False,
             "pinyin": QUESTIONS[idx]["pinyin"],
         }
-        
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
