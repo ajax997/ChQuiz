@@ -92,6 +92,7 @@
                 if (response.ok) {
                     window.location.reload();
                 } else {
+                    console.log(idToken)
                     alert("Authentication failed on backend.");
                     alert(response.message);
                 }

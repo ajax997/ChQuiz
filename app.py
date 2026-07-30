@@ -1,20 +1,22 @@
 import csv
 import random
 import os
-from firebase_admin import credentials, initialize_app,auth
+from firebase_admin import credentials,auth
+import firebase_admin
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 
 from mongo_connect import test_mongo_connection
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SERVICE_SECRET")
+app.secret_key = "SUPER-SECRET-KEY-HERE"
 
 @app.route("/test_mongo")
 def mongo():
     return test_mongo_connection()
 
 cred = credentials.Certificate("serviceAccountKey.json")
-initialize_app(cred)
+firebase_admin.initialize_app(cred)
+
 
 @app.route("/")
 def index():
@@ -28,10 +30,12 @@ def verify_token():
     id_token = data.get("idToken")
 
     if not id_token:
-        return jsonify({"status": "error", "message": "Missing idToken in request payload."}), 400
+        return jsonify({"status": "error", "message": "No token sent"}), 400
 
     try:
-        decoded_token = auth.verify_id_token(id_token)
+        # Verify the token
+        decoded_token = auth.verify_id_token(id_token, clock_skew_seconds=10)
+
         session["user"] = {
             "uid": decoded_token.get("uid"),
             "email": decoded_token.get("email"),
@@ -39,10 +43,11 @@ def verify_token():
             "picture": decoded_token.get("picture"),
         }
         return jsonify({"status": "success", "user": session["user"]}), 200
-    except Exception as e:
-        print(f"Token Verification Error: {e}")  # Print to terminal so you see exact cause
-        return jsonify({"status": "error", "message": str(e)}), 401
 
+    except Exception as e:
+        # Print to Render logs AND return the exact error message in the JSON payload
+        print(f"VERIFICATION FAILURE: {str(e)}", flush=True)
+        return jsonify({"status": "error", "reason": str(e)}), 400
 @app.route("/logout", methods=["POST"])
 def logout():
     session.pop("user", None)
