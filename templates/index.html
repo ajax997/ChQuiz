@@ -5,80 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask Firebase Google Auth</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 50px auto; text-align: center; }
-        .user-card { border: 1px solid #ccc; padding: 20px; border-radius: 8px; display: inline-block; }
-        img { border-radius: 50%; width: 80px; height: 80px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; }
+        body {
+            font-family: sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .user-card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        img {
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Firebase Google Auth in Flask</h1>
+<h1>Firebase Google Auth in Flask</h1>
 
-    {% if user %}
-        <div class="user-card">
-            <img src="{{ user.picture }}" alt="Profile Picture">
-            <h2>Welcome, {{ user.name }}</h2>
-            <p>{{ user.email }}</p>
-            <button id="logout-btn">Sign Out</button>
-        </div>
-    {% else %}
-        <button id="login-btn">Sign in with Google</button>
-    {% endif %}
+{% if user %}
+    <div class="user-card">
+        <img src="{{ user.picture }}" alt="Profile Picture">
+        <h2>Welcome, {{ user.name }}</h2>
+        <p>{{ user.email }}</p>
+        <button id="logout-btn">Sign Out</button>
+    </div>
+{% else %}
+    <button id="login-btn">Sign in with Google</button>
+{% endif %}
 
-    <!-- Firebase App & Auth SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<!-- Firebase App & Auth SDKs -->
+<script type="module">
+    import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+        getAuth,
+        signInWithPopup,
+        GoogleAuthProvider,
+        signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        // Replace with your Firebase web app config
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+    // Replace with your Firebase web app config
+    const firebaseConfig = {
+        apiKey: "AIzaSyAETrg1LQk7Rxw2mWXjNAtv9RIfW9GpriA",
+        authDomain: "chquiz-f8a7d.firebaseapp.com",
+        projectId: "chquiz-f8a7d",
+        storageBucket: "chquiz-f8a7d.firebasestorage.app",
+        messagingSenderId: "341130057342",
+        appId: "1:341130057342:web:167cafd452477f15dc6a2f",
+        measurementId: "G-YXN5T1X3RY"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-        const loginBtn = document.getElementById("login-btn");
-        const logoutBtn = document.getElementById("logout-btn");
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
 
-        if (loginBtn) {
-            loginBtn.addEventListener("click", async () => {
-                try {
-                    const result = await signInWithPopup(auth, provider);
-                    const idToken = await result.user.getIdToken();
+    if (loginBtn) {
+        loginBtn.addEventListener("click", async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const idToken = await result.user.getIdToken();
 
-                    // Send ID token to Flask backend for verification
-                    const response = await fetch("/api/verify-token", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ idToken })
-                    });
+                // Send ID token to Flask backend for verification
+                const response = await fetch("/api/verify-token", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({idToken})
+                });
 
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        alert("Authentication failed on backend.");
-                    }
-                } catch (error) {
-                    console.error("Login Error:", error);
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert("Authentication failed on backend.");
                 }
-            });
-        }
+            } catch (error) {
+                console.error("Login Error:", error);
+            }
+        });
+    }
 
-        if (logoutBtn) {
-            logoutBtn.addEventListener("click", async () => {
-                await signOut(auth);
-                await fetch("/logout", { method: "POST" });
-                window.location.reload();
-            });
-        }
-    </script>
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", async () => {
+            await signOut(auth);
+            await fetch("/logout", {method: "POST"});
+            window.location.reload();
+        });
+    }
+</script>
 </body>
 </html>
