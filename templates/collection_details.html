@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Collection</title>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, Segoe UI, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            transition: .25s;
+        }
+
+        .header-inner {
+            max-width: 1000px;
+            margin: auto;
+            padding: 24px;
+        }
+
+        .header.compact .hero-stats {
+            display: none;
+        }
+
+        .collection-title {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .hero-stats {
+            margin-top: 8px;
+            color: var(--muted);
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            border: none;
+            cursor: pointer;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        .control-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .control-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .practice-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content {
+            max-width: 1000px;
+            margin: auto;
+            padding: 24px;
+        }
+
+        .item-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+            transition: .2s;
+        }
+
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, .08);
+        }
+
+        .item-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .character {
+            min-width: 70px;
+            text-align: center;
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .pinyin {
+            font-size: 18px;
+            color: #4b5563;
+        }
+
+        .badges {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .badge.mastery {
+            color: #2563eb;
+            background: #dbeafe;
+        }
+
+        .badge.new {
+            color: #059669;
+            background: #d1fae5;
+        }
+
+        .badge.hsk {
+            color: #7c3aed;
+            background: #ede9fe;
+        }
+
+        .progress {
+            margin-top: 12px;
+            height: 8px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(
+                    90deg,
+                    #3b82f6,
+                    #06b6d4
+            );
+        }
+
+        .empty {
+            text-align: center;
+            color: var(--muted);
+            padding: 60px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+
+            border: none;
+            cursor: pointer;
+
+            background: var(--primary);
+            color: white;
+
+            border-radius: 999px;
+            padding: 16px 22px;
+            font-weight: 700;
+
+            box-shadow: 0 10px 25px rgba(37, 99, 235, .35);
+
+            z-index: 200;
+        }
+
+        @media (max-width: 768px) {
+
+            .collection-title {
+                font-size: 24px;
+            }
+
+            .character {
+                font-size: 34px;
+                min-width: 55px;
+            }
+
+        }
+    </style>
+</head>
+<body>
+
+<header class="header" id="header">
+    <div class="header-inner">
+
+        <h1 class="collection-title">
+            Collection
+        </h1>
+
+        <div class="hero-stats" id="stats">
+            Loading...
+        </div>
+
+        <div class="controls">
+
+            <button
+                    class="control-btn active"
+                    id="sort-added">
+                Added Date
+            </button>
+
+            <button
+                    class="control-btn"
+                    id="sort-mastery">
+                Mastery
+            </button>
+
+            <button
+                    class="control-btn practice-btn"
+                    id="practice-btn">
+                ▶ Practice
+            </button>
+
+        </div>
+
+    </div>
+</header>
+
+<main class="content">
+
+    <div id="items">
+        <div class="loading">
+            Loading collection...
+        </div>
+    </div>
+
+</main>
+
+<button class="fab">
+    ▶ Practice
+</button>
+
+<script type="module">
+
+    import {
+        fetchWithAuth,
+        auth
+    } from "{{ url_for('static', filename='js/auth.js') }}";
+
+    async function waitForAuth() {
+        return new Promise((resolve) => {
+            const unsubscribe = auth.onAuthStateChanged((user) => {
+                unsubscribe();
+                resolve(user);
+            });
+        });
+    }
+
+    const collectionId =
+        window.location.pathname.split('/').pop();
+
+    let items = [];
+    let currentSort = "added";
+
+    const itemsContainer =
+        document.getElementById("items");
+
+    function masteryValue(item) {
+        return parseFloat(
+            item.mastery_score || 0
+        );
+    }
+
+    function characterText(item) {
+
+        return (
+            item.character_simplified ||
+            item.word_simplified ||
+            item.sentence_simplified ||
+            "?"
+        );
+    }
+
+    function pinyinText(item) {
+
+        return (
+            item.character_pinyin ||
+            item.word_pinyin ||
+            item.sentence_pinyin ||
+            ""
+        );
+    }
+
+    function renderStats() {
+
+        const avgMastery =
+            items.length
+                ? (
+                    items.reduce(
+                        (sum, i) => sum + masteryValue(i),
+                        0
+                    ) / items.length
+                ).toFixed(0)
+                : 0;
+
+        document.getElementById("stats")
+            .innerHTML = `
+            ${items.length} items •
+            ${avgMastery}% average mastery
+        `;
+    }
+
+    function renderItems() {
+
+        let sorted = [...items];
+
+        if (currentSort === "mastery") {
+
+            sorted.sort(
+                (a, b) =>
+                    masteryValue(b)
+                    -
+                    masteryValue(a)
+            );
+        } else {
+
+            sorted.sort(
+                (a, b) =>
+                    a.display_order -
+                    b.display_order
+            );
+        }
+
+        if (sorted.length === 0) {
+
+            itemsContainer.innerHTML = `
+            <div class="empty">
+                No items found
+            </div>
+        `;
+
+            return;
+        }
+
+        itemsContainer.innerHTML =
+            sorted.map(item => {
+
+                const mastery =
+                    masteryValue(item);
+
+                return `
+                <div class="item-card">
+
+                    <div class="item-row">
+
+                        <div class="character">
+                            ${characterText(item)}
+                        </div>
+
+                        <div class="item-details">
+
+                            <div class="pinyin">
+                                ${pinyinText(item)}
+                            </div>
+
+                            <div class="badges">
+
+                                ${
+                    mastery === 0
+                        ?
+                        `
+                                    <span class="badge new">
+                                        New
+                                    </span>
+                                    `
+                        :
+                        ''
+                }
+
+                                <span
+                                    class="badge mastery">
+
+                                    ${mastery.toFixed(0)}%
+                                    Mastery
+                                </span>
+
+                                ${
+                    item.hsk_level
+                        ?
+                        `
+                                    <span class="badge hsk">
+                                        HSK ${item.hsk_level}
+                                    </span>
+                                    `
+                        :
+                        ''
+                }
+
+                            </div>
+
+                            <div class="progress">
+                                <div
+                                    class="progress-fill"
+                                    style="
+                                        width:${mastery}%
+                                    ">
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            `;
+            }).join('');
+    }
+
+    async function loadCollection() {
+
+        try {
+            const user = await waitForAuth();
+            if (!user) {
+                throw new Error("User not signed in");
+            }
+            const response =
+                await fetchWithAuth(
+                    `/api/collection/${collectionId}`
+                );
+
+            items = await response.json();
+
+            renderStats();
+            renderItems();
+
+        } catch (err) {
+
+            console.error(err);
+
+            itemsContainer.innerHTML = `
+            <div class="empty">
+                Failed to load collection
+            </div>
+        `;
+        }
+    }
+
+    document
+        .getElementById("sort-added")
+        .addEventListener("click", () => {
+
+            currentSort = "added";
+
+            document
+                .querySelectorAll(".control-btn")
+                .forEach(btn =>
+                    btn.classList.remove("active")
+                );
+
+            document
+                .getElementById("sort-added")
+                .classList.add("active");
+
+            renderItems();
+        });
+
+    document
+        .getElementById("sort-mastery")
+        .addEventListener("click", () => {
+
+            currentSort = "mastery";
+
+            document
+                .querySelectorAll(".control-btn")
+                .forEach(btn =>
+                    btn.classList.remove("active")
+                );
+
+            document
+                .getElementById("sort-mastery")
+                .classList.add("active");
+
+            renderItems();
+        });
+
+    window.addEventListener("scroll", () => {
+
+        const header =
+            document.getElementById("header");
+
+        if (window.scrollY > 100) {
+            header.classList.add("compact");
+        } else {
+            header.classList.remove("compact");
+        }
+    });
+
+    loadCollection();
+
+</script>
+
+</body>
+</html>

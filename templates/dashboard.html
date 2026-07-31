@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <button id="load-data-btn">Load Secret Data</button>
+    <div id="result"></div>
+
+    <!-- 1. Use type="module" to allow ES imports -->
+    <script type="module">
+        // Use Flask's url_for to load the static JavaScript file
+        import { fetchWithAuth, auth } from "{{ url_for('static', filename='js/auth.js') }}";
+
+        const loadBtn = document.getElementById("load-data-btn");
+        const resultDiv = document.getElementById("result");
+
+        loadBtn.addEventListener("click", async () => {
+            try {
+                // Makes request with 'Authorization: Bearer <token>' header attached
+                const response = await fetchWithAuth("/api/protected-data");
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerText = JSON.stringify(data, null, 2);
+                } else {
+                    resultDiv.innerText = "Error: " + data.error;
+                }
+            } catch (err) {
+                console.error("API Call Failed:", err);
+                resultDiv.innerText = "Failed to send request. Make sure you are logged in.";
+            }
+        });
+    </script>
+</body>
+</html>

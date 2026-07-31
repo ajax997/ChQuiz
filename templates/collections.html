@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collections</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, Segoe UI, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+            padding: 32px;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            margin-top: 6px;
+        }
+
+        .collections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .collection-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05),
+            0 2px 8px rgba(0, 0, 0, 0.03);
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: 1px solid #edf0f5;
+        }
+
+        .collection-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.08),
+            0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .collection-name {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .collection-type {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .collection-type.system {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .info-row {
+            margin-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .privacy-badge {
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 999px;
+        }
+
+        .private {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .public {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .created-date {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .loading,
+        .empty {
+            text-align: center;
+            padding: 80px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h1>Collections</h1>
+    <p>Your learning collections</p>
+</div>
+
+<div id="content">
+    <div class="loading">Loading collections...</div>
+</div>
+
+<script type="module">
+    import {
+        fetchWithAuth,
+        auth
+    } from "{{ url_for('static', filename='js/auth.js') }}";
+
+    async function waitForAuth() {
+        return new Promise((resolve) => {
+            const unsubscribe = auth.onAuthStateChanged((user) => {
+                unsubscribe();
+                resolve(user);
+            });
+        });
+    }
+
+    const contentEl = document.getElementById('content');
+
+    function formatDate(value) {
+        return new Date(value).toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+    function renderCollections(collections) {
+
+        if (!collections || collections.length === 0) {
+            contentEl.innerHTML = `
+                    <div class="empty">
+                        No collections found
+                    </div>
+                `;
+            return;
+        }
+
+        contentEl.innerHTML = `
+                <div class="collections-grid">
+                    ${collections.map(collection => `
+                        <div
+                            class="collection-card"
+                            data-id="${collection.id}"
+                        >
+                            <div class="card-top">
+                                <div class="collection-name">
+                                    ${collection.name}
+                                </div>
+
+                                <span class="collection-type ${collection.type}">
+                                    ${collection.type}
+                                </span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="privacy-badge ${
+            collection.is_public
+                ? 'public'
+                : 'private'
+        }">
+                                    ${collection.is_public
+            ? 'Public'
+            : 'Private'}
+                                </span>
+
+                                <span class="created-date">
+                                    ${formatDate(collection.created_at)}
+                                </span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+        document.querySelectorAll('.collection-card')
+            .forEach(card => {
+                card.addEventListener('click', () => {
+                    const collectionId = card.dataset.id;
+
+                    // navigate to collection detail page
+                    window.location.href =
+                        `/learning/collection/${collectionId}`;
+                });
+            });
+    }
+
+    async function loadCollections() {
+        try {
+            const user = await waitForAuth();
+
+            if (!user) {
+                throw new Error("User not signed in");
+            }
+
+            const response = await fetchWithAuth(
+                "/api/collection/list"
+            );
+
+            const collections = await response.json();
+
+            renderCollections(collections);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    loadCollections();
+</script>
+
+</body>
+</html>
