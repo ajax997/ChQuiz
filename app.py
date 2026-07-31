@@ -4,26 +4,45 @@ import os
 from firebase_admin import credentials,auth
 import firebase_admin
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
-
-from mongo_connect import test_mongo_connection
-
+from db import init_db
+from controllers.collection import collection_bp
+from controllers.render import learning_bp
 app = Flask(__name__)
 app.secret_key = "SUPER-SECRET-KEY-HERE"
-
-@app.route("/test_mongo")
-def mongo():
-    return test_mongo_connection()
-
+app.json.ensure_ascii = False
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
-
+app.register_blueprint(collection_bp)
+app.register_blueprint(learning_bp)
 @app.route("/")
 def index():
     user = session.get("user")
     return render_template("index.html", user=user)
 
+def verify_bearer_token(request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return None
 
+    id_token = auth_header.split("Bearer ")[1]
+    try:
+        decoded_token = auth.verify_id_token(id_token)
+        return decoded_token
+    except Exception:
+        return None
+
+@app.route("/dashboard", methods=["GET"])
+def dashboard():
+    return render_template("dashboard.html")
+
+@app.route("/api/protected-data", methods=["GET"])
+def get_protected_data():
+    decoded_token = verify_bearer_token(request)
+    if not decoded_token:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    return jsonify({"data": f"Hello user {decoded_token}"})
 @app.route("/api/verify-token", methods=["POST"])
 def verify_token():
     data = request.get_json(silent=True) or {}
@@ -53,12 +72,6 @@ def logout():
     session.pop("user", None)
     return jsonify({"status": "success"}), 200
 
-@app.route("/about")
-def about():
-    if "user" not in session:
-        return redirect(url_for("login"))
-
-    return render_template("about.html", username=session["user"])
 
 def load_questions(csv_file):
     questions = []
@@ -131,4 +144,5 @@ def check():
 
 
 if __name__ == "__main__":
+    init_db()
     app.run(debug=True)
