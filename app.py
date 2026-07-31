@@ -12,7 +12,7 @@ app.secret_key = "SUPER-SECRET-KEY-HERE"
 app.json.ensure_ascii = False
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
-
+init_db()
 app.register_blueprint(collection_bp)
 app.register_blueprint(learning_bp)
 @app.route("/")
@@ -144,5 +144,5 @@ def check():
 
 
 if __name__ == "__main__":
-    init_db()
+
     app.run(debug=True)
