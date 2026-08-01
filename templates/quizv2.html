@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width,
+                   initial-scale=1,
+                   viewport-fit=cover">
+    <title>Chinese Typing Practice</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com">
+
+    <style>
+        :root {
+            --primary: #58cc02;
+            --danger: #ff4b4b;
+            --card-radius: 28px;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            background: #f5f7fb;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                sans-serif;
+            overscroll-behavior: none;
+            padding-bottom: 140px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: auto;
+            padding-top: 40px;
+        }
+
+        .card {
+            border: none;
+            border-radius: var(--card-radius);
+            box-shadow: 0 15px 40px rgba(0,0,0,.08);
+        }
+
+        .progress {
+            height: 12px;
+            border-radius: 999px;
+        }
+
+        .progress-bar {
+            background: var(--primary);
+        }
+
+        .sentence {
+            font-size: 40px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .typing-box {
+            font-size: 20px !important;
+            height: 60px;
+            text-align: center;
+            border-radius: 16px;
+        }
+
+        .typing-box:focus {
+            box-shadow: none;
+            border-color: var(--primary);
+        }
+
+        .feedback {
+            min-height: 36px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .correct {
+            color: var(--primary);
+        }
+
+        .wrong {
+            color: var(--danger);
+        }
+
+        #pinyin {
+            font-family: "Roboto", sans-serif;
+            display: none;
+            font-size: 22px;
+            color: #656565;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .bottom-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            padding: 16px;
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
+            border-top: 1px solid #eee;
+            box-shadow: 0 -10px 25px rgba(0,0,0,.08);
+            transition: bottom .15s;
+            z-index: 999;
+        }
+
+        .btn-success {
+            background: var(--primary);
+            border: none;
+        }
+
+        .btn-success:hover {
+            background: #4eb400;
+        }
+
+        .shake {
+            animation: shake .35s;
+        }
+
+        @keyframes shake {
+            0%   { transform: translateX(0); }
+            25%  { transform: translateX(-8px); }
+            50%  { transform: translateX(8px); }
+            75%  { transform: translateX(-8px); }
+            100% { transform: translateX(0); }
+        }
+
+        .example-card {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #ececec;
+        }
+
+        .example-cn {
+            font-size: 22px;
+            font-weight: 700;
+            color: #222;
+        }
+
+        .example-pinyin {
+            margin-top: 6px;
+            color: #777;
+            font-size: 15px;
+        }
+
+        .example-translation {
+            margin-top: 8px;
+            color: #444;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body p-4 p-md-5">
+
+            <div class="d-flex justify-content-between mb-2">
+                <small class="text-secondary">
+                    Question {{ number }} / {{ total }}
+                </small>
+
+                <small class="text-secondary">
+                    {{ ((number/total)*100)|round|int }}%
+                </small>
+            </div>
+
+            <div class="progress">
+                <div class="progress-bar"
+                     style="width:{{ (number/total)*100 }}%">
+                </div>
+            </div>
+
+            <div class="sentence">
+                {{ question.cn }}
+            </div>
+
+            <div id="pinyin">
+                {{ question.pinyin }}
+            </div>
+
+            <p class="text-center text-secondary mb-3">
+                {{ question.translation }}
+                <br>
+                {{ question.hanviet }}
+            </p>
+
+            <input
+                    id="answer"
+                    class="form-control typing-box"
+                    autocomplete="one-time-code"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    inputmode="text"
+                    enterkeyhint="done"
+                    autofocus>
+
+            <div id="feedback" class="feedback"></div>
+
+            <div id="examples"
+                 style="display:none;margin-top:25px;">
+
+                <h5 class="text-center mb-3">
+                    Example Sentences
+                </h5>
+
+                <div id="exampleList"></div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="bottom-bar">
+    <div class="d-grid">
+        <button
+                id="nextBtn"
+                class="btn btn-success btn-lg"
+                onclick="nextQuestion()"
+                style="display:none">
+            Next Question
+        </button>
+    </div>
+</div>
+
+<audio id="correctSound">
+    <source src="https://raw.githubusercontent.com/ajax997/ChQuiz/main/correct.ogg"
+            type="audio/ogg">
+</audio>
+
+<script>
+
+const correct = "{{ question.cn }}";
+
+const currentWord = "{{ question.cn }}";
+// Better:
+// const currentWord = "{{ question.content_id }}";
+
+const input = document.getElementById("answer");
+const feedback = document.getElementById("feedback");
+const bottomBar = document.querySelector(".bottom-bar");
+
+let failedAttempts = 0;
+let answeredCorrectly = false;
+
+function normalize(text) {
+    return text
+        .replace(/\s+/g, "")
+        .trim();
+}
+
+function nextQuestion() {
+    location.reload();
+}
+
+function showPinyin() {
+    document.getElementById("pinyin").style.display = "block";
+}
+
+async function loadExamples() {
+
+    try {
+
+        const response = await fetch(
+            "/api/content/example/" +
+            encodeURIComponent(currentWord)
+        );
+
+        if (!response.ok) {
+            return;
+        }
+
+        const examples = await response.json();
+
+        const list =
+            document.getElementById("exampleList");
+
+        list.innerHTML = "";
+
+        examples
+            .slice(0, 3)
+            .forEach(example => {
+
+                list.innerHTML += `
+                    <div class="example-card">
+
+                        <div class="example-cn">
+                            ${example.simplified}
+                        </div>
+
+                        <div class="example-pinyin">
+                            ${example.pinyin}
+                        </div>
+
+                        <div class="example-translation">
+                            ${example.translation}
+                        </div>
+
+                    </div>
+                `;
+            });
+
+        if (examples.length > 0) {
+            document.getElementById("examples")
+                    .style.display = "block";
+        }
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function check() {
+
+    if (answeredCorrectly) return;
+
+    const value = input.value;
+
+    if (normalize(value) === normalize(correct)) {
+
+        answeredCorrectly = true;
+        failedAttempts = 0;
+
+        feedback.innerHTML =
+            '<span class="correct">✓ Correct!</span>';
+
+        document.getElementById("correctSound").play();
+
+        await fetch("/check", {
+            method: "POST",
+            headers: {
+                "Content-Type":
+                    "application/x-www-form-urlencoded"
+            },
+            body:
+                "answer=" +
+                encodeURIComponent(value)
+        });
+
+        await loadExamples();
+
+        document.getElementById("nextBtn")
+                .style.display = "block";
+
+        input.disabled = true;
+
+    } else {
+
+        failedAttempts++;
+
+        feedback.innerHTML =
+            '<span class="wrong">✗ Try Again</span>';
+
+        input.classList.remove("shake");
+        void input.offsetWidth;
+        input.classList.add("shake");
+
+        if (failedAttempts >= 2) {
+            showPinyin();
+        }
+    }
+}
+
+input.addEventListener("keydown", function(e) {
+
+    if (e.key !== "Enter") {
+        return;
+    }
+
+    e.preventDefault();
+
+    if (!answeredCorrectly) {
+        check();
+    }
+});
+
+function updateBottomBar() {
+
+    if (!window.visualViewport) return;
+
+    const keyboardHeight =
+        window.innerHeight -
+        window.visualViewport.height;
+
+    bottomBar.style.bottom =
+        Math.max(keyboardHeight, 0) + "px";
+}
+
+if (window.visualViewport) {
+
+    visualViewport.addEventListener(
+        "resize",
+        updateBottomBar
+    );
+
+    visualViewport.addEventListener(
+        "scroll",
+        updateBottomBar
+    );
+
+    updateBottomBar();
+}
+
+window.onload = () => {
+    input.focus();
+};
+
+</script>
+
+</body>
+</html>
