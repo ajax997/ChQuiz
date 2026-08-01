@@ -19,12 +19,10 @@
             --danger: #ff4b4b;
             --card-radius: 28px;
         }
-
         html,
         body {
             height: 100%;
         }
-
         body {
             background: #f5f7fb;
             font-family: -apple-system,
@@ -35,28 +33,23 @@
             overscroll-behavior: none;
             padding-bottom: 140px;
         }
-
         .container {
             max-width: 720px;
             margin: auto;
             padding-top: 40px;
         }
-
         .card {
             border: none;
             border-radius: var(--card-radius);
             box-shadow: 0 15px 40px rgba(0, 0, 0, .08);
         }
-
         .progress {
             height: 12px;
             border-radius: 999px;
         }
-
         .progress-bar {
             background: var(--primary);
         }
-
         .sentence {
             font-size: 40px;
             font-weight: 700;
@@ -64,19 +57,16 @@
             text-align: center;
             margin: 15px 0;
         }
-
         .typing-box {
             font-size: 20px !important;
             height: 60px;
             text-align: center;
             border-radius: 16px;
         }
-
         .typing-box:focus {
             box-shadow: none;
             border-color: var(--primary);
         }
-
         .feedback {
             min-height: 36px;
             margin-top: 20px;
@@ -84,15 +74,12 @@
             font-size: 22px;
             font-weight: 600;
         }
-
         .correct {
             color: var(--primary);
         }
-
         .wrong {
             color: var(--danger);
         }
-
         #pinyin {
             font-family: "Roboto", sans-serif;
             display: none;
@@ -101,7 +88,6 @@
             text-align: center;
             margin-top: 12px;
         }
-
         .bottom-bar {
             position: fixed;
             left: 0;
@@ -115,20 +101,16 @@
             transition: bottom .15s;
             z-index: 999;
         }
-
         .btn-success {
             background: var(--primary);
             border: none;
         }
-
         .btn-success:hover {
             background: #4eb400;
         }
-
         .shake {
             animation: shake .35s;
         }
-
         @keyframes shake {
             0% {
                 transform: translateX(0);
@@ -191,7 +173,6 @@
                     autofocus>
             <div id="feedback"
                  class="feedback"></div>
-
         </div>
     </div>
 </div>
@@ -216,32 +197,23 @@
     const bottomBar = document.querySelector(".bottom-bar");
     let failedAttempts = 0;
     let answeredCorrectly = false;
-
     function normalize(text) {
         return text
             .replace(/\s+/g, "")
             .trim();
     }
-
     function nextQuestion() {
         location.reload();
     }
-
     async function check() {
         if (answeredCorrectly) return;
-
         const value = input.value;
-
         if (normalize(value) === normalize(correct)) {
-
             answeredCorrectly = true;
             failedAttempts = 0;
-
             feedback.innerHTML =
                 '<span class="correct">✓ Correct!</span>';
-
             document.getElementById("correctSound").play();
-
             await fetch("/check", {
                 method: "POST",
                 headers: {
@@ -249,42 +221,30 @@
                 },
                 body: "answer=" + encodeURIComponent(value)
             });
-
             document.getElementById("nextBtn").style.display = "block";
-
             input.disabled = true;
-
         } else {
-
             failedAttempts++;
-
             feedback.innerHTML =
                 '<span class="wrong">✗ Try Again</span>';
-
             input.classList.remove("shake");
             void input.offsetWidth;
             input.classList.add("shake");
-
             if (failedAttempts >= 2) {
                 showPinyin();
             }
         }
     }
-
     function showPinyin() {
         document.getElementById("pinyin").style.display = "block";
     }
-
     input.addEventListener("keydown", function (e) {
         if (e.key !== "Enter") return;
-
         e.preventDefault();
-
         if (!answeredCorrectly) {
             check();
         }
     });
-
     function updateBottomBar() {
         if (!window.visualViewport) return;
         const keyboardHeight =
@@ -292,7 +252,6 @@
         bottomBar.style.bottom =
             Math.max(keyboardHeight, 0) + "px";
     }
-
     if (window.visualViewport) {
         visualViewport.addEventListener("resize", updateBottomBar);
         visualViewport.addEventListener("scroll", updateBottomBar);

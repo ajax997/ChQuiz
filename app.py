@@ -4,6 +4,8 @@ import os
 from firebase_admin import credentials,auth
 import firebase_admin
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
+
+from controllers.content import content_bp
 from db import init_db
 from controllers.collection import collection_bp
 from controllers.render import learning_bp
@@ -15,6 +17,7 @@ firebase_admin.initialize_app(cred)
 init_db()
 app.register_blueprint(collection_bp)
 app.register_blueprint(learning_bp)
+app.register_blueprint(content_bp)
 @app.route("/")
 def index():
     user = session.get("user")
@@ -118,7 +121,7 @@ def quiz():
         return "<h1>🎉 Finished!</h1><a href='/'>Restart</a>"
 
     return render_template(
-        "quiz.html",
+        "quizv2.html",
         question=QUESTIONS[idx],
         number=idx + 1,
         total=len(QUESTIONS),
