@@ -273,7 +273,16 @@
 <button class="fab">
     ▶ Practice
 </button>
-
+<button
+        class="control-btn practice-btn"
+        id="practice-btn">
+    ▶ Practice
+</button>
+<script>
+    document.getElementById("practice-btn").addEventListener("click", () => {
+        window.location.href = window.location.pathname + "/quiz/matching";
+    });
+</script>
 <script type="module">
 
     import {
@@ -308,7 +317,7 @@
     function characterText(item) {
 
         return (
-            item.character_simplified ||
+            item.simplified ||
             item.word_simplified ||
             item.sentence_simplified ||
             "?"
@@ -318,7 +327,7 @@
     function pinyinText(item) {
 
         return (
-            item.character_pinyin ||
+            item.pinyin ||
             item.word_pinyin ||
             item.sentence_pinyin ||
             ""

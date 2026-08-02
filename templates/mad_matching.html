@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Collection Matching Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #58cc02;
+            --green-dark: #46a302;
+            --blue: #1cb0f6;
+            --blue-dark: #168ace;
+            --red: #ff4b4b;
+            --yellow: #ffc800;
+            --bg: #f7f7f7;
+            --card: #ffffff;
+            --text: #3c3c3c;
+            --muted: #777;
+            --border: #e5e5e5;
+            --shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Noto Sans",
+            "Noto Sans SC",
+            "Segoe UI",
+            sans-serif;
+            background: radial-gradient(circle at top left, rgba(88, 204, 2, 0.14), transparent 32%),
+            radial-gradient(circle at top right, rgba(28, 176, 246, 0.16), transparent 34%),
+            var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 28px 18px 42px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #58cc02, #1cb0f6);
+            color: white;
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.16);
+            right: -42px;
+            top: -50px;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(28px, 4vw, 44px);
+            letter-spacing: -0.8px;
+        }
+
+        .hero p {
+            margin: 10px 0 0;
+            font-size: 16px;
+            opacity: 0.94;
+        }
+
+        .settings {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(160px, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+            background: rgba(255, 255, 255, 0.18);
+            padding: 16px;
+            border-radius: 22px;
+            backdrop-filter: blur(8px);
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        select,
+        input {
+            height: 44px;
+            border: 0;
+            border-radius: 14px;
+            padding: 0 13px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            background: white;
+            outline: none;
+            box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            border: 0;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.15s ease;
+            box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.18);
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+        }
+
+        .start-btn {
+            background: white;
+            color: var(--green-dark);
+            height: 44px;
+            align-self: end;
+        }
+
+        .top-bar {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+            align-items: center;
+            margin: 22px 0;
+        }
+
+        .progress-panel {
+            background: var(--card);
+            border-radius: 22px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .progress-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+
+        .progress-label {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .progress-value {
+            color: var(--green-dark);
+        }
+
+        .progress-track {
+            height: 18px;
+            background: #e9e9e9;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--green), var(--blue));
+            border-radius: 999px;
+            transition: width 0.25s ease;
+        }
+
+        .score-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            padding: 16px 22px;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .score-number {
+            font-size: 32px;
+            font-weight: 1000;
+            color: var(--green);
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 800;
+            margin-top: 5px;
+        }
+
+        .quiz-card {
+            background: var(--card);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 22px;
+        }
+
+        .round-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .round-title {
+            font-size: 22px;
+            font-weight: 1000;
+            margin: 0;
+        }
+
+        .round-subtitle {
+            color: var(--muted);
+            margin: 4px 0 0;
+            font-weight: 650;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #eef9e9;
+            color: var(--green-dark);
+            border: 1px solid #d6f2c8;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .column-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            font-weight: 1000;
+            color: var(--muted);
+            padding-left: 6px;
+        }
+
+        .option {
+            min-height: 42px;
+            padding: 8px;
+
+            font-size: 14px;
+            font-weight: 400;
+
+            border-radius: 10px;
+            border: 1px solid #dddddd;
+
+            box-shadow: none;
+
+            line-height: 1.3;
+        }
+
+        .option.small-text {
+
+
+            font-family: system-ui;
+            font-size: 11px;
+            line-height: 1.3;
+        }
+
+        .option:hover:not(:disabled) {
+            border-color: var(--blue);
+            background: #f3fbff;
+        }
+
+        .option.selected {
+            border-color: var(--blue);
+            background: #ddf4ff;
+            color: var(--blue-dark);
+        }
+
+        .option.correct {
+            border-color: var(--green);
+            background: #e7ffd8;
+            color: var(--green-dark);
+            box-shadow: inset 0 -4px 0 #b6e89c;
+        }
+
+        .option.wrong {
+            border-color: var(--red);
+            background: #fff0f0;
+            color: var(--red);
+            animation: shake 0.22s ease;
+        }
+
+        .option:disabled {
+            cursor: default;
+            opacity: 0.72;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            50% {
+                transform: translateX(5px);
+            }
+            75% {
+                transform: translateX(-3px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .message {
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: #fff7d7;
+            color: #8a6500;
+            font-weight: 850;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .finish {
+            display: none;
+            text-align: center;
+            background: white;
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 36px 22px;
+        }
+
+        .finish.show {
+            display: block;
+        }
+
+        .finish-emoji {
+            font-size: 64px;
+            margin-bottom: 12px;
+        }
+
+        .finish h2 {
+            margin: 0;
+            font-size: 34px;
+            color: var(--green-dark);
+        }
+
+        .finish p {
+            color: var(--muted);
+            font-weight: 750;
+            font-size: 17px;
+        }
+
+        .restart-btn {
+            background: var(--green);
+            color: white;
+            padding: 14px 24px;
+            margin-top: 10px;
+        }
+
+        .loading {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 26px;
+            margin-top: 22px;
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Default desktop */
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+
+            .page {
+                padding: 8px;
+            }
+
+            .hero {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .hero h1 {
+                font-size: 22px;
+            }
+
+            .settings {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .top-bar {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .quiz-card {
+                padding: 12px;
+                border-radius: 16px;
+            }
+
+            .columns {
+                gap: 8px;
+            }
+
+            .column {
+                gap: 8px;
+            }
+
+            .option {
+                min-height: 46px;
+                padding: 8px;
+
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 1.4;
+
+                border-radius: 10px;
+            }
+
+            .option.small-text {
+                font-size: 12px;
+            }
+
+            .round-title {
+                font-size: 18px;
+            }
+
+            .round-subtitle {
+                font-size: 12px;
+            }
+
+            .progress-panel,
+            .score-card {
+                padding: 10px;
+                border-radius: 12px;
+            }
+
+            .score-number {
+                font-size: 24px;
+            }
+        }
+
+
+        @media (max-width: 520px) {
+            .settings {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 22px;
+            }
+
+            .quiz-card {
+                padding: 16px;
+            }
+
+            .round-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<audio id="correctSound">
+    <source src="https://raw.githubusercontent.com/ajax997/ChQuiz/main/correct.ogg" type="audio/ogg">
+</audio>
+
+<main class="page">
+    <section class="quiz-header">
+
+    <div class="header-row">
+        <h1>Match</h1>
+
+        <div class="settings-mini">
+            <select id="leftField">
+                <option value="simplified">简体</option>
+                <option value="traditional">繁體</option>
+                <option value="pinyin">Pinyin</option>
+                <option value="sino">Hán Việt</option>
+                <option value="vietnamese_translation">VN</option>
+            </select>
+
+            <span>→</span>
+
+            <select id="rightField">
+                <option value="vietnamese_translation">VN</option>
+                <option value="simplified">简体</option>
+                <option value="traditional">繁體</option>
+                <option value="pinyin">Pinyin</option>
+                <option value="sino">Hán Việt</option>
+            </select>
+
+            <input
+                id="pairCount"
+                type="number"
+                value="5"
+                min="2"
+                max="20"
+            />
+
+            <button id="startBtn">
+                ↻
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+    <div id="loading" class="loading">
+        Loading collection...
+    </div>
+
+    <section id="gameArea" class="hidden">
+        <div class="top-bar">
+            <div class="progress-panel">
+                <div class="progress-row">
+                    <span class="progress-label">Collection progress</span>
+                    <span id="progressText" class="progress-value">0 / 0</span>
+                </div>
+                <div class="progress-track">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="score-card">
+                <div id="scoreValue" class="score-number">0</div>
+                <div class="score-label">Matches</div>
+            </div>
+        </div>
+
+        <section id="quizCard" class="quiz-card">
+            <div class="round-header">
+                <div>
+                    <h2 id="roundTitle" class="round-title">Round 1</h2>
+                    <p id="roundSubtitle" class="round-subtitle">Match each item with its pair.</p>
+                </div>
+                <div id="roundPill" class="pill">0 pairs left</div>
+            </div>
+
+            <div class="columns">
+                <div>
+                    <div id="leftColumnTitle" class="column-title">Left</div>
+                    <div id="leftColumn" class="column"></div>
+                </div>
+
+                <div>
+                    <div id="rightColumnTitle" class="column-title">Right</div>
+                    <div id="rightColumn" class="column"></div>
+                </div>
+            </div>
+
+            <div id="message" class="message"></div>
+        </section>
+
+        <section id="finishScreen" class="finish">
+            <div class="finish-emoji">🏆</div>
+            <h2>Collection complete!</h2>
+            <p id="finishText">Great job. You matched every pair.</p>
+            <button id="restartBtn" class="restart-btn">Play again</button>
+        </section>
+    </section>
+</main>
+
+<script>
+    const FIELD_LABELS = {
+        simplified: "Simplified",
+        traditional: "Traditional",
+        pinyin: "Pinyin",
+        sino: "Sino Vietnamese",
+        vietnamese_translation: "Vietnamese"
+    };
+
+    const state = {
+        collectionId: null,
+        items: [],
+        currentIndex: 0,
+        roundNumber: 1,
+        totalMatched: 0,
+        selectedLeft: null,
+        selectedRight: null,
+        currentPairs: [],
+        leftField: "simplified",
+        rightField: "vietnamese_translation",
+        pairCount: 5,
+        locked: false
+    };
+
+    const els = {
+        loading: document.getElementById("loading"),
+        gameArea: document.getElementById("gameArea"),
+        quizCard: document.getElementById("quizCard"),
+        finishScreen: document.getElementById("finishScreen"),
+        finishText: document.getElementById("finishText"),
+
+        leftField: document.getElementById("leftField"),
+        rightField: document.getElementById("rightField"),
+        pairCount: document.getElementById("pairCount"),
+        startBtn: document.getElementById("startBtn"),
+        restartBtn: document.getElementById("restartBtn"),
+
+        leftColumn: document.getElementById("leftColumn"),
+        rightColumn: document.getElementById("rightColumn"),
+        leftColumnTitle: document.getElementById("leftColumnTitle"),
+        rightColumnTitle: document.getElementById("rightColumnTitle"),
+
+        roundTitle: document.getElementById("roundTitle"),
+        roundSubtitle: document.getElementById("roundSubtitle"),
+        roundPill: document.getElementById("roundPill"),
+        progressText: document.getElementById("progressText"),
+        progressFill: document.getElementById("progressFill"),
+        scoreValue: document.getElementById("scoreValue"),
+        message: document.getElementById("message"),
+        correctSound: document.getElementById("correctSound")
+    };
+
+    document.addEventListener("DOMContentLoaded", init);
+    els.startBtn.addEventListener("click", startGame);
+    els.restartBtn.addEventListener("click", restartGame);
+
+    async function init() {
+        state.collectionId = getCollectionIdFromUrl();
+
+        if (!state.collectionId) {
+            showLoadingError("Cannot find collection_id from URL. Expected: /learing/collection/<uuid>/quiz/matching");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/collection/${state.collectionId}`);
+
+            if (!response.ok) {
+                throw new Error(`API returned ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            state.items = normalizeApiResponse(data).filter(isValidItem);
+
+            if (!state.items.length) {
+                showLoadingError("No valid collection items found.");
+                return;
+            }
+
+            els.loading.classList.add("hidden");
+            els.gameArea.classList.remove("hidden");
+
+            startGame();
+        } catch (error) {
+            console.error(error);
+            showLoadingError("Could not load the collection. Please check your API response.");
+        }
+    }
+
+    function getCollectionIdFromUrl() {
+        const path = window.location.pathname;
+
+        // Expected:
+        // /learing/collection/<uuid:collection_id>/quiz/matching
+        // Also works for:
+        // /learning/collection/<uuid:collection_id>/quiz/matching
+        const match = path.match(/\/(?:learing|learning)\/collection\/([^/]+)\/quiz\/matching/i);
+
+        if (match && match[1]) {
+            return decodeURIComponent(match[1]);
+        }
+
+        const fallback = path.match(/\/collection\/([^/]+)/i);
+        return fallback && fallback[1] ? decodeURIComponent(fallback[1]) : null;
+    }
+
+    function normalizeApiResponse(data) {
+        if (Array.isArray(data)) return data;
+
+        if (Array.isArray(data.items)) return data.items;
+        if (Array.isArray(data.collection_items)) return data.collection_items;
+        if (Array.isArray(data.data)) return data.data;
+        if (Array.isArray(data.results)) return data.results;
+
+        return [];
+    }
+
+    function isValidItem(item) {
+        return item
+            && typeof item === "object"
+            && (
+                item.simplified
+                || item.traditional
+                || item.pinyin
+                || item.sino
+                || item.vietnamese_translation
+            );
+    }
+
+    function startGame() {
+        state.leftField = els.leftField.value;
+        state.rightField = els.rightField.value;
+
+        if (state.leftField === state.rightField) {
+            showMessage("Choose two different fields for the left and right columns.");
+            return;
+        }
+
+        state.pairCount = clamp(Number(els.pairCount.value || 5), 2, 20);
+        els.pairCount.value = state.pairCount;
+
+        state.currentIndex = 0;
+        state.roundNumber = 1;
+        state.totalMatched = 0;
+        state.selectedLeft = null;
+        state.selectedRight = null;
+        state.locked = false;
+
+        els.finishScreen.classList.remove("show");
+        els.quizCard.classList.remove("hidden");
+        hideMessage();
+
+        renderRound();
+    }
+
+    function restartGame() {
+        startGame();
+    }
+
+    function renderRound() {
+        clearSelections();
+
+        if (state.currentIndex >= state.items.length) {
+            showFinishScreen();
+            return;
+        }
+
+        const roundItems = state.items
+            .slice(state.currentIndex, state.currentIndex + state.pairCount)
+            .map((item, index) => ({
+                pairId: `pair-${state.currentIndex + index}`,
+                item
+            }))
+            .filter(pair => getFieldValue(pair.item, state.leftField) && getFieldValue(pair.item, state.rightField));
+
+        if (!roundItems.length) {
+            state.currentIndex += state.pairCount;
+            renderRound();
+            return;
+        }
+
+        state.currentPairs = roundItems;
+
+        const leftOptions = shuffle([...roundItems]);
+        const rightOptions = shuffle([...roundItems]);
+
+        els.leftColumn.innerHTML = "";
+        els.rightColumn.innerHTML = "";
+
+        els.leftColumnTitle.textContent = FIELD_LABELS[state.leftField] || state.leftField;
+        els.rightColumnTitle.textContent = FIELD_LABELS[state.rightField] || state.rightField;
+
+        leftOptions.forEach(pair => {
+            els.leftColumn.appendChild(createOptionButton({
+                side: "left",
+                pairId: pair.pairId,
+                value: getFieldValue(pair.item, state.leftField)
+            }));
+        });
+
+        rightOptions.forEach(pair => {
+            els.rightColumn.appendChild(createOptionButton({
+                side: "right",
+                pairId: pair.pairId,
+                value: getFieldValue(pair.item, state.rightField)
+            }));
+        });
+
+        updateHud();
+    }
+
+    function createOptionButton({side, pairId, value}) {
+        const button = document.createElement("button");
+        button.className = "option";
+        button.type = "button";
+        button.dataset.side = side;
+        button.dataset.pairId = pairId;
+        button.textContent = value;
+
+        if (String(value).length > 28 || side === "right" && state.rightField === "vietnamese_translation") {
+            button.classList.add("small-text");
+        }
+
+        button.addEventListener("click", () => selectOption(button));
+
+        return button;
+    }
+
+    function selectOption(button) {
+        if (state.locked || button.disabled || button.classList.contains("correct")) {
+            return;
+        }
+
+        const side = button.dataset.side;
+
+        if (side === "left") {
+            if (state.selectedLeft) {
+                state.selectedLeft.classList.remove("selected");
+            }
+            state.selectedLeft = button;
+        } else {
+            if (state.selectedRight) {
+                state.selectedRight.classList.remove("selected");
+            }
+            state.selectedRight = button;
+        }
+
+        button.classList.add("selected");
+
+        if (state.selectedLeft && state.selectedRight) {
+            checkPair();
+        }
+    }
+
+    function checkPair() {
+        const left = state.selectedLeft;
+        const right = state.selectedRight;
+
+        if (!left || !right) return;
+
+        state.locked = true;
+
+        const isCorrect = left.dataset.pairId === right.dataset.pairId;
+
+        if (isCorrect) {
+            markCorrect(left, right);
+            state.totalMatched += 1;
+
+            setTimeout(() => {
+                state.selectedLeft = null;
+                state.selectedRight = null;
+                state.locked = false;
+                hideMessage();
+                updateHud();
+
+                if (isRoundComplete()) {
+                    finishRound();
+                }
+            }, 280);
+        } else {
+            left.classList.add("wrong");
+            right.classList.add("wrong");
+            showMessage("Not quite. Try another match.");
+
+            setTimeout(() => {
+                left.classList.remove("selected", "wrong");
+                right.classList.remove("selected", "wrong");
+                state.selectedLeft = null;
+                state.selectedRight = null;
+                state.locked = false;
+            }, 520);
+        }
+    }
+
+    function markCorrect(left, right) {
+        left.classList.remove("selected");
+        right.classList.remove("selected");
+
+        left.classList.add("correct");
+        right.classList.add("correct");
+
+        left.disabled = true;
+        right.disabled = true;
+    }
+
+    function isRoundComplete() {
+        const remaining = document.querySelectorAll(".option:not(.correct)").length;
+        return remaining === 0;
+    }
+
+    function finishRound() {
+        playCorrectSound();
+
+        state.currentIndex += state.pairCount;
+        state.roundNumber += 1;
+
+        updateHud();
+
+        if (state.currentIndex >= state.items.length) {
+            setTimeout(showFinishScreen, 700);
+        } else {
+            showMessage("Nice! Moving to the next set.");
+            setTimeout(() => {
+                hideMessage();
+                renderRound();
+            }, 850);
+        }
+    }
+
+    function showFinishScreen() {
+        els.quizCard.classList.add("hidden");
+        els.finishScreen.classList.add("show");
+        els.finishText.textContent = `Great job. You matched ${state.totalMatched} pair${state.totalMatched === 1 ? "" : "s"}.`;
+        updateHud(true);
+        playCorrectSound();
+    }
+
+    function updateHud(forceComplete = false) {
+        const total = state.items.length;
+        const completed = forceComplete ? total : Math.min(state.currentIndex, total);
+        const visibleMatchedInRound = document.querySelectorAll(".option.correct").length / 2;
+        const progressCurrent = Math.min(state.currentIndex + visibleMatchedInRound, total);
+        const percent = total ? Math.round((progressCurrent / total) * 100) : 0;
+
+        els.progressText.textContent = `${Math.floor(progressCurrent)} / ${total}`;
+        els.progressFill.style.width = `${percent}%`;
+        els.scoreValue.textContent = state.totalMatched;
+
+        const pairsLeft = Math.max(0, state.currentPairs.length - visibleMatchedInRound);
+
+        els.roundTitle.textContent = `Round ${state.roundNumber}`;
+        els.roundSubtitle.textContent = `Items ${state.currentIndex + 1} to ${Math.min(state.currentIndex + state.pairCount, total)} of ${total}`;
+        els.roundPill.textContent = `${pairsLeft} pair${pairsLeft === 1 ? "" : "s"} left`;
+    }
+
+    function getFieldValue(item, field) {
+        const value = item[field];
+
+        if (value === null || value === undefined) {
+            return "";
+        }
+
+        return String(value).trim();
+    }
+
+    function clearSelections() {
+        state.selectedLeft = null;
+        state.selectedRight = null;
+        state.locked = false;
+    }
+
+    function showMessage(text) {
+        els.message.textContent = text;
+        els.message.classList.add("show");
+    }
+
+    function hideMessage() {
+        els.message.classList.remove("show");
+        els.message.textContent = "";
+    }
+
+    function showLoadingError(text) {
+        els.loading.textContent = text;
+        els.loading.style.color = "#ff4b4b";
+    }
+
+    function playCorrectSound() {
+        try {
+            els.correctSound.currentTime = 0;
+            const playPromise = els.correctSound.play();
+
+            if (playPromise && typeof playPromise.catch === "function") {
+                playPromise.catch(() => {
+                    /*
+                        Browsers may block autoplay until the user interacts.
+                        Since the quiz requires clicking, this usually works after the first interaction.
+                    */
+                });
+            }
+        } catch (error) {
+            console.warn("Sound could not be played.", error);
+        }
+    }
+
+    function shuffle(array) {
+        const result = [...array];
+
+        for (let i = result.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [result[i], result[j]] = [result[j], result[i]];
+        }
+
+        return result;
+    }
+
+    function clamp(value, min, max) {
+        if (Number.isNaN(value)) return min;
+        return Math.min(Math.max(value, min), max);
+    }
+</script>
+</body>
+</html>

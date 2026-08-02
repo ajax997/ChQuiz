@@ -55,7 +55,8 @@
         getAuth,
         signInWithPopup,
         GoogleAuthProvider,
-        signOut
+        signOut,
+        onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     // Replace with your Firebase web app config
@@ -73,6 +74,13 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
+
+    // Redirect if already logged in
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            window.location.href = "/learning/collection";
+        }
+    });
     const loginBtn = document.getElementById("login-btn");
     const logoutBtn = document.getElementById("logout-btn");
 
@@ -90,7 +98,7 @@
                 });
 
                 if (response.ok) {
-                    window.location.reload();
+                    window.location = "/learning/collection"
                 } else {
                     console.log(idToken)
                     alert("Authentication failed on backend.");

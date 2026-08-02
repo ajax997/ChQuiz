@@ -11,3 +11,8 @@ def get_collection():
 def get_collection_item(collection_id: UUID):
     # collection_id is a uuid.UUID object
     return render_template("collection_details.html")
+
+@learning_bp.route("/collection/<uuid:collection_id>/quiz/matching", methods=["GET"])
+def mad_matching(collection_id: UUID):
+    # collection_id is a uuid.UUID object
+    return render_template("mad_matching.html")
