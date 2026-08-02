@@ -237,22 +237,20 @@
 
         <div class="controls">
 
-            <button
-                    class="control-btn active"
-                    id="sort-added">
+            <button class="control-btn active" id="sort-added">
                 Added Date
             </button>
 
-            <button
-                    class="control-btn"
-                    id="sort-mastery">
+            <button class="control-btn" id="sort-mastery">
                 Mastery
             </button>
 
-            <button
-                    class="control-btn practice-btn"
-                    id="practice-btn">
-                ▶ Practice
+            <button class="control-btn practice-btn" id="practice-btn-matching">
+                🎯 Matching
+            </button>
+
+            <button class="control-btn practice-btn" id="practice-btn-typing">
+                ⌨️ Typing
             </button>
 
         </div>
@@ -278,9 +276,18 @@
         id="practice-btn">
     ▶ Practice
 </button>
+<button
+        class="control-btn practice-btn"
+        id="practice-btn-typing">
+    ▶ Practice Typing
+</button>
 <script>
     document.getElementById("practice-btn").addEventListener("click", () => {
         window.location.href = window.location.pathname + "/quiz/matching";
+    });
+
+    document.getElementById("practice-btn-typing").addEventListener("click", () => {
+        window.location.href = window.location.pathname + "/quiz/typing";
     });
 </script>
 <script type="module">

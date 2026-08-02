@@ -121,7 +121,7 @@ def quiz():
         return "<h1>🎉 Finished!</h1><a href='/'>Restart</a>"
 
     return render_template(
-        "quizv2.html",
+        "quiz.html",
         question=QUESTIONS[idx],
         number=idx + 1,
         total=len(QUESTIONS),

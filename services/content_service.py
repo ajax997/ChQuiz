@@ -7,19 +7,18 @@ def get_all_example_by_content(content):
     try:
         cur = conn.cursor(cursor_factory=RealDictCursor)
 
-        cur.execute("""
-                    SELECT s.content_id,
-                           s.simplified,
-                           s.traditional,
-                           s.pinyin,
-                           t.language_code,
-                           t.translation
-                    FROM sentence s
-                             JOIN translation t
-                                  ON t.content_id = s.content_id and t.language_code = 'vi'
-                    WHERE s.segments ~ %s
-                    ORDER BY s.simplified, t.language_code;
-                    """, (content,))
+        cur.execute("""SELECT DISTINCT ON (s.simplified) s.content_id,
+                                                         s.simplified,
+                                                         s.traditional,
+                                                         s.pinyin,
+                                                         t.language_code,
+                                                         t.translation
+                       FROM sentence s
+                                JOIN translation t
+                                     ON t.content_id = s.content_id
+                                         AND t.language_code = 'vi'
+                       WHERE s.segments ~ %s
+                       ORDER BY s.simplified, s.content_id;""", (content,))
 
         return cur.fetchall()
 
