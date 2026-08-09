@@ -1,6 +1,9 @@
 import csv
+import hashlib
 import random
 import os
+import time
+
 from firebase_admin import credentials,auth
 import firebase_admin
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
@@ -127,7 +130,11 @@ def quiz():
         total=len(QUESTIONS),
     )
 
-
+@app.route("/ping", methods=["GET"])
+def ping():
+    timestamp = time.time()
+    hash_value = hashlib.sha256(str(timestamp).encode()).hexdigest()
+    return hash_value
 @app.route("/check", methods=["POST"])
 def check():
     idx = session.get("question", 0)

@@ -7,12 +7,13 @@
     <title>Chinese Typing Practice</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap"
+          rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect"
           href="https://fonts.gstatic.com"
           crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com">
     <style>
         :root {
@@ -22,10 +23,12 @@
             --text-main: #202124;
             --text-muted: #656565;
         }
+
         html,
         body {
             height: 100%;
         }
+
         body {
             background: #f5f7fb;
             font-family: "Noto Sans", "Noto Sans SC", -apple-system,
@@ -34,6 +37,7 @@
             padding-bottom: 140px;
             color: var(--text-main);
         }
+
         .container {
             max-width: 720px;
             margin: auto;
@@ -41,18 +45,22 @@
             padding-left: 14px;
             padding-right: 14px;
         }
+
         .card {
             border: none;
             border-radius: var(--card-radius);
             box-shadow: 0 15px 40px rgba(0, 0, 0, .08);
         }
+
         .progress {
             height: 12px;
             border-radius: 999px;
         }
+
         .progress-bar {
             background: var(--primary);
         }
+
         .sentence {
             font-family: "Noto Serif SC", serif;
             font-size: 40px;
@@ -62,19 +70,23 @@
             margin: 15px 0;
             line-height: 1.35;
         }
+
         .typing-box {
             font-size: 20px !important;
             height: 60px;
             text-align: center;
             border-radius: 16px;
         }
+
         #examples {
             margin-bottom: 120px;
         }
+
         .typing-box:focus {
             box-shadow: none;
             border-color: var(--primary);
         }
+
         .feedback {
             min-height: 36px;
             margin-top: 20px;
@@ -82,12 +94,15 @@
             font-size: 22px;
             font-weight: 600;
         }
+
         .correct {
             color: var(--primary);
         }
+
         .wrong {
             color: var(--danger);
         }
+
         #pinyin {
             display: none;
             font-size: 22px;
@@ -96,6 +111,7 @@
             margin-top: 12px;
             line-height: 1.5;
         }
+
         .bottom-bar {
             position: fixed;
             left: 0;
@@ -109,16 +125,20 @@
             transition: bottom .15s;
             z-index: 999;
         }
+
         .btn-success {
             background: var(--primary);
             border: none;
         }
+
         .btn-success:hover {
             background: #4eb400;
         }
+
         .shake {
             animation: shake .35s;
         }
+
         @keyframes shake {
             0% {
                 transform: translateX(0);
@@ -136,6 +156,7 @@
                 transform: translateX(0);
             }
         }
+
         .example-card {
             background: #f8f9fa;
             border-radius: 16px;
@@ -143,12 +164,14 @@
             margin-bottom: 12px;
             border: 1px solid #ececec;
         }
+
         .example-card-top {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
             gap: 10px;
         }
+
         .example-cn {
             font-family: "Noto Serif SC", serif;
             font-size: 22px;
@@ -157,18 +180,21 @@
             line-height: 1.45;
             flex: 1;
         }
+
         .example-pinyin {
             color: #777;
             font-size: 15px;
             margin-top: 5px;
             line-height: 1.5;
         }
+
         .example-translation {
             color: #444;
             font-size: 16px;
             margin-top: 4px;
             line-height: 1.5;
         }
+
         .keyboard-btn {
             width: 42px;
             height: 42px;
@@ -182,14 +208,17 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
             flex: 0 0 auto;
         }
+
         .keyboard-btn:hover {
             background: #eefbe8;
             color: var(--primary);
         }
+
         .keyboard-btn svg {
             width: 21px;
             height: 21px;
         }
+
         dialog.practice-dialog {
             width: min(92vw, 560px);
             border: none;
@@ -198,13 +227,16 @@
             box-shadow: 0 25px 80px rgba(0, 0, 0, .25);
             background: white;
         }
+
         dialog.practice-dialog::backdrop {
             background: rgba(20, 24, 28, .45);
             backdrop-filter: blur(3px);
         }
+
         .dialog-body {
             padding: 24px;
         }
+
         .dialog-header-row {
             display: flex;
             align-items: center;
@@ -212,11 +244,13 @@
             gap: 12px;
             margin-bottom: 12px;
         }
+
         .dialog-title {
             font-size: 17px;
             font-weight: 700;
             color: #333;
         }
+
         .dialog-close-btn {
             width: 36px;
             height: 36px;
@@ -227,9 +261,11 @@
             font-size: 22px;
             line-height: 1;
         }
+
         .dialog-close-btn:hover {
             background: #e8eaed;
         }
+
         .dialog-cn {
             font-family: "Noto Sans SC", "Noto Sans", sans-serif;
             font-size: 26px;
@@ -238,6 +274,7 @@
             line-height: 1.45;
             margin: 12px 0 8px;
         }
+
         .dialog-translation {
             font-size: 16px;
             color: #555;
@@ -245,6 +282,7 @@
             line-height: 1.5;
             margin-bottom: 14px;
         }
+
         .dialog-pinyin {
             display: none;
             font-size: 18px;
@@ -253,6 +291,7 @@
             line-height: 1.5;
             margin-bottom: 14px;
         }
+
         .dialog-feedback {
             min-height: 32px;
             margin-top: 14px;
@@ -260,47 +299,59 @@
             font-size: 19px;
             font-weight: 600;
         }
+
         .helper-text {
             text-align: center;
             color: #888;
             font-size: 13px;
             margin-top: 8px;
         }
+
         @media (max-width: 576px) {
             body {
                 padding-bottom: 120px;
             }
+
             .container {
                 padding-top: 20px;
             }
+
             .card-body {
                 padding: 24px 18px !important;
             }
+
             .sentence {
                 font-size: 30px;
                 letter-spacing: .5px;
             }
+
             #pinyin {
                 font-size: 18px;
             }
+
             .typing-box {
                 height: 54px;
                 font-size: 18px !important;
             }
+
             .example-cn {
                 font-size: 19px;
             }
+
             .example-translation {
                 font-size: 15px;
             }
+
             .keyboard-btn {
                 width: 38px;
                 height: 38px;
                 border-radius: 13px;
             }
+
             .dialog-body {
                 padding: 20px 16px;
             }
+
             .dialog-cn {
                 font-size: 22px;
             }
@@ -416,6 +467,20 @@
             type="audio/ogg">
 </audio>
 <script>
+    function startPing() {
+        const ping = () => {
+            fetch("/ping")
+                .catch(console.error)
+                .finally(() => {
+                    const delay = 10_000 + Math.random() * 20_000; // 10–30s
+                    setTimeout(ping, delay);
+                });
+        };
+        ping();
+    }
+    startPing();
+</script>
+<script>
     const correct = {{ question.cn | tojson }};
     const currentWord = {{ question.cn | tojson }};
     const input = document.getElementById("answer");
@@ -432,11 +497,13 @@
     let activeExample = null;
     let dialogFailedAttempts = 0;
     let dialogAnsweredCorrectly = false;
+
     function normalize(text) {
         return String(text || "")
             .replace(/\s+/g, "")
             .trim();
     }
+
     function toggleHanviet() {
         const el = document.getElementById("hanviet");
         if (el.style.display === "none") {
@@ -445,6 +512,7 @@
             el.style.display = "none";
         }
     }
+
     function playCorrectSound() {
         const sound = document.getElementById("correctSound");
         try {
@@ -454,12 +522,15 @@
             console.warn("Sound could not be played", err);
         }
     }
+
     function nextQuestion() {
         location.reload();
     }
+
     function showPinyin() {
         document.getElementById("pinyin").style.display = "block";
     }
+
     function createKeyboardIcon() {
         return `
             <svg viewBox="0 0 24 24"
@@ -481,6 +552,7 @@
             </svg>
         `;
     }
+
     async function loadExamples() {
         try {
             const response = await fetch(
@@ -535,6 +607,7 @@
             console.error(err);
         }
     }
+
     async function check() {
         if (answeredCorrectly) return;
         const value = input.value;
@@ -570,6 +643,7 @@
             }
         }
     }
+
     function openExamplePractice(example) {
         activeExample = {
             cn: example.simplified || "",
@@ -590,6 +664,7 @@
             dialogAnswer.focus();
         });
     }
+
     function closeExamplePractice() {
         if (exampleDialog.open) {
             exampleDialog.close();
@@ -603,9 +678,11 @@
         dialogAnsweredCorrectly = false;
         input.focus();
     }
+
     function showDialogPinyin() {
         dialogPinyin.style.display = "block";
     }
+
     function checkExamplePractice() {
         if (!activeExample || dialogAnsweredCorrectly) return;
         const value = dialogAnswer.value;
@@ -631,6 +708,7 @@
             }
         }
     }
+
     input.addEventListener("keydown", function (e) {
         if (e.key !== "Enter") {
             return;
@@ -658,6 +736,7 @@
             closeExamplePractice();
         }
     });
+
     function updateBottomBar() {
         if (!window.visualViewport) return;
         const keyboardHeight =
@@ -666,6 +745,7 @@
         bottomBar.style.bottom =
             Math.max(keyboardHeight, 0) + "px";
     }
+
     if (window.visualViewport) {
         visualViewport.addEventListener(
             "resize",
