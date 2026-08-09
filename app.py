@@ -112,7 +112,7 @@ def load_questions(csv_file):
     return questions
 
 
-QUESTIONS = load_questions("hanzii-t-mi_old.csv")
+QUESTIONS = load_questions("hanzii-t-mi.csv")
 @app.route("/quiz")
 def quiz():
     idx = session.get("question", 0)
