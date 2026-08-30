@@ -604,7 +604,7 @@
             const list = document.getElementById("exampleList");
             list.innerHTML = "";
             examples
-                .slice(0, 10)
+                .slice(0, 30)
                 .forEach((example, index) => {
                     const card = document.createElement("div");
                     card.className = "example-card";
@@ -614,7 +614,7 @@
 
                     const cn = document.createElement("div");
                     cn.className = "example-cn";
-                    cn.textContent = example.simplified || "";
+                    cn.textContent = example.Simplified || "";
 
                     // Speaker button
                     const speakerBtn = document.createElement("button");
@@ -626,7 +626,7 @@
                     );
                     speakerBtn.innerHTML = "🔊";
                     speakerBtn.addEventListener("click", () => {
-                        speakChinese(example.simplified || "");
+                        speakChinese(example.Simplified || "");
                     });
 
                     // Keyboard button
@@ -648,11 +648,11 @@
 
                     const pinyin = document.createElement("div");
                     pinyin.className = "example-pinyin";
-                    pinyin.textContent = example.pinyin || "";
+                    pinyin.textContent = example.Pinyin || "";
 
                     const translation = document.createElement("div");
                     translation.className = "example-translation";
-                    translation.textContent = example.translation || "";
+                    translation.textContent = example.Translation || "";
 
                     card.appendChild(top);
                     card.appendChild(pinyin);
@@ -708,9 +708,9 @@
 
     function openExamplePractice(example) {
         activeExample = {
-            cn: example.simplified || "",
-            pinyin: example.pinyin || "",
-            translation: example.translation || ""
+            cn: example.Simplified || "",
+            pinyin: example.Pinyin || "",
+            translation: example.Translation || ""
         };
         dialogFailedAttempts = 0;
         dialogAnsweredCorrectly = false;
