@@ -28,77 +28,91 @@
 
 
 import pandas as pd
-
-
-CSV_FILE = "newsentence.csv"
+import jieba
 
 
 class SentenceService:
-    def __init__(self, csv_file):
-        self.df = self._load_csv(csv_file)
 
-    def _load_csv(self, csv_file):
+    def __init__(self, csv_file):
+        self.sentences = []
+        self.index = {}
+
+        self._load(csv_file)
+
+    def _load(self, csv_file):
+
         try:
-            return pd.read_csv(
+            df = pd.read_csv(
                 csv_file,
-                encoding="utf-8-sig"
+                encoding="utf-8"
             )
         except UnicodeDecodeError:
-            return pd.read_csv(
+            df = pd.read_csv(
                 csv_file,
                 encoding="gb18030"
             )
 
-    def get_all_example_by_content(self, content):
-        """
-        Find sentences containing `content`.
+        for _, row in df.iterrows():
 
-        Returns:
-            list[dict]
-        """
+            sentence = {
+                "Simplified": str(row["Simplified"]),
+                "Traditional": str(row["Traditional"]),
+                "Pinyin": str(row["Pinyin"]),
+                "language_code": "vi",
+                "Translation": str(row["Translation"]),
+            }
+
+            self.sentences.append(sentence)
+
+            # Build inverted index
+            words = set(jieba.cut(sentence["Simplified"]))
+
+            for word in words:
+
+                if not word.strip():
+                    continue
+
+                if word not in self.index:
+                    self.index[word] = []
+
+                self.index[word].append(sentence)
+
+        print(
+            f"Loaded {len(self.sentences)} sentences"
+        )
+        print(
+            f"Index contains {len(self.index)} words"
+        )
+
+    def get_all_example_by_content(self, content):
 
         if not content:
             return []
 
-        # Search Simplified Chinese.
-        # regex=False means content is treated literally.
-        results = self.df[
-            self.df["Simplified"].str.contains(
-                content,
-                regex=False,
-                na=False
-            )
-        ].copy()
+        # Fast path: exact jieba word
+        results = self.index.get(content, [])
 
-        # Remove duplicate Simplified sentences
-        results = results.drop_duplicates(
-            subset=["Simplified"]
-        )
+        # Preserve your old DISTINCT behavior
+        seen = set()
+        output = []
 
-        # Return the same structure that the old DB query returned
-        results["language_code"] = "vi"
+        for sentence in results:
 
-        return results[
-            [
-                "Simplified",
-                "Traditional",
-                "Pinyin",
-                "language_code",
-                "Translation",
-            ]
-        ].to_dict("records")
+            simplified = sentence["Simplified"]
+
+            if simplified in seen:
+                continue
+
+            seen.add(simplified)
+            output.append(sentence)
+
+        return output
 
 
-# --------------------------------------------------
-# Load CSV ONCE
-# --------------------------------------------------
+sentence_service = SentenceService(
+    "newsentence.csv"
+)
 
-sentence_service = SentenceService(CSV_FILE)
-
-
-# --------------------------------------------------
-# Public function
-# --------------------------------------------------
 
 def get_all_example_by_content(content):
     return sentence_service.get_all_example_by_content(content)
